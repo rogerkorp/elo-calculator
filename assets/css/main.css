@@ -1,0 +1,35 @@
+/* ------- Custom Properties ------- */
+
+:root{
+    --black: #000000;
+    --white: #ffffff;
+}
+
+
+
+/* ------- Custom Fonts ------- */
+
+
+
+
+/* ------- Class Rules ------- */
+
+.class{
+    color: black;
+}
+
+
+
+/* ------- ID Rules ------- */
+
+#id{
+    color: white;
+}
+
+
+
+/* ------- Media Queries ------- */
+
+@media screen and (max-width: 800px){
+    
+}
