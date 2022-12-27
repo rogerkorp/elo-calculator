@@ -3,22 +3,41 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Title</title>
+        <title>ELO Ranker</title>
         <link rel="stylesheet" href="assets/css/normalize.css">
         <link rel="stylesheet" href="assets/css/main.css">
-        <!-- Favicon Information -->
-        <!-- <link rel="icon" sizes="any" type="image/svg+xml" href="assets/icons/favicon.svg"> -->
+        <link rel="icon" sizes="any" type="image/svg+xml" href="assets/icons/favicon.svg">
     </head>
     <body> 
         <!-- Put navigation links below.
         <nav></nav>
         -->
-        <main> <!-- Favicon Information -->
-            <h1>index.html</h1>
+        <main>
+            <div id="exercise" style="display: none">
+                <div id="choices"></div>
+                <p id="votes-needed">Votes Needed: 0/0</p>
+                <details>
+                    <summary>Results</summary>
+                    <ul id="results-list"></ul>
+                    <table id="list-item-matrix"></table>
+                </details>
+                <p id="matrix-shuffle"></p>
+
+            </div>
+            <h1>ELO Calculator</h1>
+            <form id="create-new-list" name="create-new-list" onsubmit="return createNewList(this)">
+                <label for="write-new-question">Comparison Question:</label><br>
+                <input name="write-new-question" type="text" id="question" placeholder="Ex. Which one do you prefer?" required><br>
+                <label for="write-new-list">Write list items:</label><br>
+                <textarea name="write-new-list" id="write-new-list" placeholder="Ex. Apple, Banana, Lime, etc." required></textarea><br>
+                <input type="submit" name="create-new-list-submit" id="create-new-list-submit" value="Submit">
+            </form>
         </main>
-        <!-- Put footer information (copyright, contact, web-map, etc.) here.
-        <footer></footer>
-        -->
-        <script src="assets/scripts/script.js"></script>
+        <!-- Put footer information (copyright, contact, web-map, etc.) here. -->
+        <footer>
+            <p>Created by Roger Korpics</p>
+            <a href="mailto:">Contact</a>
+        </footer>
+        <script src="assets/scripts/main.js"></script>
     </body>
 </html>
