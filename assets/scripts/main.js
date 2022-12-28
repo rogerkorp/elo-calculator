@@ -95,9 +95,23 @@ function shuffle(array){
 function printMatrix(myArray){
     let result = "";
 
+    result += '<table>'
+
+    for (let i=0; i<(myArray.length)+1; i++) {
+       result += '<colgroup></colgroup>'
+    };
+
+    result +='<tr><td><td><td>'
+
+    for (let i=0; i<myArray.length; i++) {
+        result += '<th scope="column" class="column-header">' + (i+1) + '</th>';
+    };
+
+    result += '</tr>'
+
     for (let i=0; i<myArray.length; i++) {
         result += "<tr>";
-        result += '<th scope="row">' + list[i] + ' (' + Math.round(elo[i]) + ')</th>';
+        result += '<th scope="row">' + list[i] + '</th><th> (' + Math.round(elo[i]) + ')</th><th scope="row">' + (i+1) + '</th>';
         for (let j=0; j<myArray[i].length; j++){
             if (booleanMatrix[i][j] === 50){
                 result +=  '<td class="neutral">'
@@ -106,14 +120,15 @@ function printMatrix(myArray){
             } else if (booleanMatrix[i][j] < 50){
                 result +=  '<td class="negative">' 
             }
-            result += Math.round(totalVotes[i][j]) + '<span class="tooltiptext">' + myArray[i][j] + ' (' + booleanMatrix[i][j] + "%)</span></td>";
+            result += Math.round(booleanMatrix[i][j]) + '%<span class="tooltiptext">' + myArray[i][j] + ' (' + booleanMatrix[i][j] + "%)</span></td>";
         }
         result += "</tr>";
     };
-    result += "</table>"
-    
 
-      return result;
+
+
+    result += "</table>"
+    return result;
 }
 
 function createNewList(){
@@ -159,6 +174,11 @@ function giveChoice(){
     let question = document.getElementById("question").value;
     let sanitizedQuestion = sanitizeInputs(question);
 
+    // Drawing criteria:
+    // 1. The two choices have to be unique (x cannot be compared to x)
+    // 2. Of the two choices, one must not have been drawn in the prior round. (if the last round was between x & y, then this round cannot have both x or y as choices. It must be one or the other. )
+    // 3. The pair must have been chosen less than frequently.
+
     do{
         do {
             chooseRow = Math.floor(Math.random() * list.length);
@@ -186,10 +206,8 @@ function giveChoice(){
 
 
 
-    document.getElementById("choices").innerHTML = '<h2>' + sanitizedQuestion + '?</h2>'
-    document.getElementById("choices").innerHTML += '<form name="make-a-choice">'
-    document.getElementById("choices").innerHTML += '<input type="button" class="choice-button" onclick="option(' + chooseRow +', ' + chooseColumn +')" name="option1" id="option1" value="' + list[chooseRow] + '">'
-    document.getElementById("choices").innerHTML += '<input type="button" class="choice-button" onclick="option(' + chooseColumn +', ' + chooseRow +')"" name="option2" id="option2" value="' + list[chooseColumn] + '"></form>'
+    document.getElementById("choices").innerHTML = '<h2>' + sanitizedQuestion + '?</h2>';
+    document.getElementById("choices").innerHTML += '<div class="buttons-to-press"><input type="button" class="choice-button" onclick="option(' + chooseRow +', ' + chooseColumn +')" name="option1" id="option1" value="' + list[chooseRow] + '">' + '<input type="button" class="choice-button" onclick="option(' + chooseColumn +', ' + chooseRow +')"" name="option2" id="option2" value="' + list[chooseColumn] + '"></div>';
 
 
     choiceA_Rating = elo[chooseRow];
