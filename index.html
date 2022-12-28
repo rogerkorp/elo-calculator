@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ELO Ranker</title>
+        <title>Ranking Tool</title>
         <link rel="stylesheet" href="assets/css/normalize.css">
         <link rel="stylesheet" href="assets/css/main.css">
         <link rel="icon" sizes="any" type="image/svg+xml" href="assets/icons/favicon.svg">
@@ -15,28 +15,36 @@
         <main>
             <div id="exercise" style="display: none">
                 <div id="choices"></div>
-                <p id="votes-needed">Votes Needed: 0/0</p>
+                <div id="votes-needed"><p class="not-ready">Votes Needed: 0/0</p></div>
                 <details>
-                    <summary>Results</summary>
+                    <summary>View Results</summary>
                     <ul id="results-list"></ul>
-                    <table id="list-item-matrix"></table>
+                    <div class="data">
+                        <table id="list-item-matrix"></table>
+                    </div>
                 </details>
-                <p id="matrix-shuffle"></p>
+                <a id="return-link" href="index.html">Go Back Home</a>
 
             </div>
-            <h1>ELO Calculator</h1>
-            <form id="create-new-list" name="create-new-list" onsubmit="return createNewList(this)">
-                <label for="write-new-question">Comparison Question:</label><br>
-                <input name="write-new-question" type="text" id="question" placeholder="Ex. Which one do you prefer?" required><br>
-                <label for="write-new-list">Write list items:</label><br>
-                <textarea name="write-new-list" id="write-new-list" placeholder="Ex. Apple, Banana, Lime, etc." required></textarea><br>
-                <input type="submit" name="create-new-list-submit" id="create-new-list-submit" value="Submit">
-            </form>
+            <div id="info">
+                <h1 class="website-title">Simple Ranking Tool</h1>
+                <form id="create-new-list" name="create-new-list" onsubmit="return createNewList(this)">
+                    <label for="write-new-question">Comparison Question:</label><br>
+                    <input class="form-text" name="write-new-question" type="text" id="question" placeholder="Ex. Which one do you prefer?" required><br>
+                    <label for="write-new-list">Contestant List:</label><br>
+                    <textarea  class="form-text" name="write-new-list" id="write-new-list" placeholder="Ex. Apples, Bananas, Limes (Seperate list items with commas)" required></textarea><br>
+                    <input class="submit-button" type="submit" name="create-new-list-submit" id="create-new-list-submit" value="Submit">
+                </form>
+                <div class="about-text">
+                    <h2>About</h2>
+                    <p>This is a website I wrote up to help me rank arbitrary things. You start by posing a comparison question (ex. "Which one do you prefer?", "Which one sounds better to you?" etc.) and then you write down a list of items you want to compete against each other. Submit the form when you're ready, and then vote on each randomized pair you are presented with. Once you have voted enough times, the rankings should be accurate enough to determine your personal preferences.</p>
+                </div>
+            </div>
         </main>
         <!-- Put footer information (copyright, contact, web-map, etc.) here. -->
         <footer>
-            <p>Created by Roger Korpics</p>
-            <a href="mailto:">Contact</a>
+            <p>Created by <b>Roger Korpics</b></p>
+            <p>December 2022</p>
         </footer>
         <script src="assets/scripts/main.js"></script>
     </body>

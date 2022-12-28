@@ -10,6 +10,10 @@ let sumTotalVotes = 0;
 
 let chooseRow;
 let chooseColumn;
+
+let lastRowChoice = 0;
+let lastColumnChoice = 0;
+
 let sum = 0;
 
 let choiceA_Rating;
@@ -23,6 +27,7 @@ let choiceB_K;
 
 let choiceA_minus_choiceB;
 let choiceB_minus_choiceA;
+let percentageRemainingVotes;
 
 let elo = [];
 
@@ -95,19 +100,12 @@ function printMatrix(myArray){
             } else if (booleanMatrix[i][j] < 50){
                 result +=  '<td class="negative">' 
             }
-            result += myArray[i][j] + ' (' + booleanMatrix[i][j] + "%)</td>";
+            result += Math.round(booleanMatrix[i][j]) + '<span class="tooltiptext">' + myArray[i][j] + ' (' + booleanMatrix[i][j] + "%)</span></td>";
         }
         result += "</tr>";
     };
     result += "</table>"
-      
-    result += "<td></td>";
-
-    for(let i=0; i<list.length; i++){
-        result += '<th scope="col">' + list[i] + '</th>';
-    }
-
-    result += "<td></td>";
+    
 
       return result;
 }
@@ -117,6 +115,7 @@ function createNewList(){
     sanitizedList = sanitizeInputs(newListValues);
     list = sanitizedList.split(",");
     document.getElementById("exercise").style.display = "block";
+    document.getElementById("info").style.display = "none";
 
     //Create table rows, 1 for each list item + 1 for the labels
     for (let i=0; i<list.length; i++) {
@@ -134,7 +133,7 @@ function createNewList(){
     //Create an equal amount of columns.
     //Black out the corners
     document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
-    document.getElementById("votes-needed").innerHTML = 'Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*15;
+    document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*20 + '</p>';
     giveChoice();
 };
 
@@ -142,20 +141,23 @@ function giveChoice(){
     let question = document.getElementById("question").value;
     let sanitizedQuestion = sanitizeInputs(question);
 
-    let chooseRow = Math.floor(Math.random() * list.length);
+    do {
+        chooseRow = Math.floor(Math.random() * list.length);
+    } while ((chooseRow == lastRowChoice) || (chooseRow == lastColumnChoice));
+
+    lastRowChoice = chooseRow
 
     do {
         chooseColumn =  Math.floor(Math.random() * list.length);
-    } while (chooseRow == chooseColumn);
+    } while ((chooseRow == chooseColumn) || (lastColumnChoice == chooseColumn));
 
+    lastColumnChoice = chooseColumn;
 
-   
 
     document.getElementById("choices").innerHTML = '<h2>' + sanitizedQuestion + '?</h2>'
-    document.getElementById("choices").innerHTML += '<p>' + list[chooseRow] + ' or ' + list[chooseColumn] + '</p>'
     document.getElementById("choices").innerHTML += '<form name="make-a-choice">'
-    document.getElementById("choices").innerHTML += '<input type="button" onclick="option(' + chooseRow +', ' + chooseColumn +')" name="option1" id="option1" value="' + list[chooseRow] + '">'
-    document.getElementById("choices").innerHTML += '<input type="button" onclick="option(' + chooseColumn +', ' + chooseRow +')"" name="option2" id="option2" value="' + list[chooseColumn] + '"></form>'
+    document.getElementById("choices").innerHTML += '<input type="button" class="choice-button" onclick="option(' + chooseRow +', ' + chooseColumn +')" name="option1" id="option1" value="' + list[chooseRow] + '">'
+    document.getElementById("choices").innerHTML += '<input type="button" class="choice-button" onclick="option(' + chooseColumn +', ' + chooseRow +')"" name="option2" id="option2" value="' + list[chooseColumn] + '"></form>'
 
 
     choiceA_Rating = elo[chooseRow];
@@ -245,19 +247,30 @@ function option(chosen, rejected){
     totalVotes[rejected][chosen] += 1;
 
     sumTotalVotes += 1;
-
     
-    document.getElementById("votes-needed").innerHTML = 'Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*15;
+    percentageRemainingVotes = sumTotalVotes / ((list.length)*20);
+
+    console.log(percentageRemainingVotes);
+
+    if (percentageRemainingVotes <= .499){
+        document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*20 + '</p>';
+    } else if ((percentageRemainingVotes >= .499) & (percentageRemainingVotes <= .999)){
+        document.getElementById("votes-needed").innerHTML = '<p class="almost-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*20 + '</p>';
+    } else if (percentageRemainingVotes >= .999){
+        document.getElementById("votes-needed").innerHTML = '<p class="ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length)*20 + '</p>';
+    }
+
+
 
     giveChoice();
     document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
 
     console.log(elo);
-
+/* 
     document.getElementById("results-list").innerHTML = " "
 
     for (let i=0; i<list.length; i++) {
         document.getElementById("results-list").innerHTML += '<li><b>' + list[i] + ': </b>' + Math.round(elo[i]) +'</li>';
-    };
+    }; */
 
 };
