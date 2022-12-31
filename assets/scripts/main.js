@@ -36,6 +36,8 @@ let choiceA_minus_choiceB;
 let choiceB_minus_choiceA;
 let percentageRemainingVotes;
 
+let colorscale = ['#67001f', '#6c0521', '#700b23', '#751125', '#791627', '#7e1a29', '#821f2b', '#87232d', '#8c282f', '#902c31', '#953034', '#993436', '#9e3838', '#a23d3b', '#a6413d', '#ab453f', '#af4942', '#b34e45', '#b85247', '#bc564a', '#c05b4d', '#c45f4f', '#c86452', '#cc6855', '#d06d58', '#d4715b', '#d8765f', '#db7b62', '#df7f65', '#e28469', '#e5896c', '#e88e70', '#eb9374', '#ee9878', '#f19e7c', '#f3a380', '#f5a886', '#f6ae8d', '#f7b394', '#f8b99c', '#f9bfa3', '#fac4aa', '#fbcab2', '#fbcfba', '#fbd5c2', '#fbdaca', '#fbe0d2', '#fbe6db', '#faece4', '#f9f1ed', '#f7f7f7', '#eff3f5', '#e8eff4', '#e0ecf2', '#d8e8f0', '#d1e4ef', '#c9e0ed', '#c2dceb', '#bad9e9', '#b3d5e7', '#abd1e5', '#a3cde3', '#9bcae1', '#94c6de', '#8dc2dc', '#88bdda', '#83b9d7', '#7eb5d5', '#79b1d2', '#74accf', '#6fa8cc', '#6ba4c9', '#66a0c6', '#629bc3', '#5e97bf', '#5a93bc', '#568fb9', '#528bb5', '#4e86b2', '#4a82ae', '#467eab', '#437aa7', '#3f76a4', '#3c72a0', '#386e9d', '#356a99', '#326695', '#2e6292', '#2b5e8e', '#285a8a', '#255686', '#225283', '#1f4e7f', '#1c4a7b', '#194678', '#164374', '#133f70', '#0f3b6c', '#0c3768', '#083465', '#053061'];
+
 let elo = [];
 
 function readData() {
@@ -161,13 +163,16 @@ function printMatrix(myArray){
         result += "<tr>";
         result += '<td class="y-axis-label" scope="row">' + list[i] + '</td><td class="y-axis-elo" scope="row">' + Math.round(elo[i]) + '</td><td class="y-axis-label" scope="row">' + (i+1) + '</th>';
         for (let j=0; j<myArray[i].length; j++){
-            if (booleanMatrix[i][j] === 50){
+            
+            result += '<td class="data-cell" style="background-color: ' + colorscale[Math.floor(booleanMatrix[i][j])] + '">'
+
+           /*  if (booleanMatrix[i][j] === 50){
                 result +=  '<td class="neutral">'
             } else if (booleanMatrix[i][j] > 50){
                 result +=  '<td class="positive">' 
             } else if (booleanMatrix[i][j] < 50){
                 result +=  '<td class="negative">' 
-            }
+            } */
             result += Math.floor(booleanMatrix[i][j]) + '%<span class="tooltiptext">' + myArray[i][j] + ' (' + (booleanMatrix[i][j]).toFixed(2) + "%)</span></td>";
         }
         result += "</tr>";
@@ -182,46 +187,47 @@ function printMatrix(myArray){
 function createNewList(){
     newListValues = document.getElementById("write-new-list").value;
     sanitizedList = sanitizeInputs(newListValues);
-
-    window.localStorage.setItem('sanitized-list', sanitizedList);
-
     list = sanitizedList.split(",");
 
-    window.localStorage.setItem('list', JSON.stringify(list));
+    if (list.length > 2){
+        window.localStorage.setItem('sanitized-list', sanitizedList);
 
-    fifoRow = Array((list.length) - 2);
-    fifoColumn = Array((list.length) - 2);
+        window.localStorage.setItem('list', JSON.stringify(list));
 
-    totalRounds = ((list.length) * (list.length)) - (list.length);
-    idealAverage = 1 / totalRounds;
+        fifoRow = Array((list.length) - 2);
+        fifoColumn = Array((list.length) - 2);
 
-
-    console.log(totalRounds);
-    console.log((idealAverage)*100 + "%");
+        totalRounds = ((list.length) * (list.length)) - (list.length);
+        idealAverage = 1 / totalRounds;
 
 
-    document.getElementById("exercise").style.display = "block";
-    document.getElementById("info").style.display = "none";
+        console.log(totalRounds);
+        console.log((idealAverage)*100 + "%");
 
-    //Create table rows, 1 for each list item + 1 for the labels
-    if (!window.localStorage.getItem('matrix')){
-        for (let i=0; i<list.length; i++) {
-            matrix[i] = [];
-            booleanMatrix[i] = []
-            totalVotes[i] = []
-            elo[i] = 1000;
-            for (let j=0; j < list.length; j++){
-                matrix[i][j] = list[i] + " v. " + list[j];
-                booleanMatrix[i][j] = 50;
-                totalVotes[i][j] = 0;
+
+        document.getElementById("exercise").style.display = "block";
+        document.getElementById("info").style.display = "none";
+
+        //Create table rows, 1 for each list item + 1 for the labels
+        if (!window.localStorage.getItem('matrix')){
+            for (let i=0; i<list.length; i++) {
+                matrix[i] = [];
+                booleanMatrix[i] = []
+                totalVotes[i] = []
+                elo[i] = 1000;
+                for (let j=0; j < list.length; j++){
+                    matrix[i][j] = list[i] + " v. " + list[j];
+                    booleanMatrix[i][j] = 50;
+                    totalVotes[i][j] = 0;
+                };
             };
         };
+        //Create an equal amount of columns.
+        //Black out the corners
+        document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
+        document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*(list.length/2) + '</p>';
+        giveChoice();
     };
-    //Create an equal amount of columns.
-    //Black out the corners
-    document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
-    document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*(list.length/2) + '</p>';
-    giveChoice();
 };
 
 function giveChoice(){
@@ -399,8 +405,10 @@ function restart(){
     window.localStorage.removeItem('elo');
     window.localStorage.removeItem('votes');
     window.localStorage.removeItem('matrix');
+    window.localStorage.removeItem('question');
     window.localStorage.removeItem('boolean-matrix');
     window.localStorage.removeItem('sum-total-votes');
+
 
     matrix = [];
     booleanMatrix = [];
