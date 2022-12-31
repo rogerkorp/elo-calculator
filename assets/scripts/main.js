@@ -5,6 +5,7 @@ let matrix = [];
 let booleanMatrix = [];
 let totalVotes = [];
 let list = [];
+let question;
 
 let sumTotalVotes = 0;
 
@@ -37,12 +38,52 @@ let percentageRemainingVotes;
 
 let elo = [];
 
+function readData() {
+    console.log("readData called");
+  
+    // Does this browser support local storage?
+    if (typeof (Storage) !== "undefined") {
+        console.log("Browser supports local storage");
+    
+        if (window.localStorage.getItem('matrix')){
+
+            let lastQuestion = window.localStorage.getItem('question');
+            document.getElementById("question").value = lastQuestion;
+
+            let lastList = window.localStorage.getItem('sanitized-list');
+            document.getElementById("write-new-list").value = lastList;
+            
+            list = JSON.parse(window.localStorage.getItem('list'));
+            matrix = JSON.parse(window.localStorage.getItem('matrix'));
+            booleanMatrix = JSON.parse(window.localStorage.getItem('boolean-matrix'));
+            elo = JSON.parse(window.localStorage.getItem('elo'));
+            totalVotes = JSON.parse(window.localStorage.getItem('votes'));
+
+            sumTotalVotes = JSON.parse(window.localStorage.getItem('sum-total-votes'));
+
+            if (window.localStorage.getItem('sum-total-votes') == null){
+                sumTotalVotes = 0;
+            }
+
+            createNewList();
+
+
+        }
+
+    } else {
+      // Sorry! No Web Storage support..
+      alert('This browser does NOT support local storage');
+    }
+  }
+  
+
+
+
 let form = document.getElementById("create-new-list");
 function handleForm(event) { 
     event.preventDefault(); 
 } 
 form.addEventListener('submit', handleForm);
-
 
 function sanitizeInputs(str){
     str = str.replace(/[^a-z0-9áéíóúñü \,-]/gim,"");
@@ -70,7 +111,11 @@ function findK(votes, rating){
     return k;
 };
 
-
+function getExpectedScore(primary, secondary){
+    let difference = secondary - primary;
+    let chances = 1/(1+10**((difference)/1000));
+    return chances;
+}
 
 
 function shuffle(array){
@@ -96,12 +141,15 @@ function printMatrix(myArray){
     let result = "";
 
     result += '<table>'
+    result += '<colgroup></colgroup>'
+    result += '<colgroup></colgroup>'
+    result += '<colgroup></colgroup>'
 
-    for (let i=0; i<(myArray.length)+1; i++) {
-       result += '<colgroup></colgroup>'
+    for (let i=0; i<(myArray.length); i++) {
+       result += '<colgroup class="shade"></colgroup>'
     };
 
-    result +='<tr><td><td><td>'
+    result +='<tr><th>NAME</th><th>ELO</th><th>ID</th>'
 
     for (let i=0; i<myArray.length; i++) {
         result += '<th scope="column" class="column-header">' + (i+1) + '</th>';
@@ -111,7 +159,7 @@ function printMatrix(myArray){
 
     for (let i=0; i<myArray.length; i++) {
         result += "<tr>";
-        result += '<th scope="row">' + list[i] + '</th><th> (' + Math.round(elo[i]) + ')</th><th scope="row">' + (i+1) + '</th>';
+        result += '<td class="y-axis-label" scope="row">' + list[i] + '</td><td class="y-axis-elo" scope="row">' + Math.round(elo[i]) + '</td><td class="y-axis-label" scope="row">' + (i+1) + '</th>';
         for (let j=0; j<myArray[i].length; j++){
             if (booleanMatrix[i][j] === 50){
                 result +=  '<td class="neutral">'
@@ -120,7 +168,7 @@ function printMatrix(myArray){
             } else if (booleanMatrix[i][j] < 50){
                 result +=  '<td class="negative">' 
             }
-            result += Math.round(booleanMatrix[i][j]) + '%<span class="tooltiptext">' + myArray[i][j] + ' (' + booleanMatrix[i][j] + "%)</span></td>";
+            result += Math.floor(booleanMatrix[i][j]) + '%<span class="tooltiptext">' + myArray[i][j] + ' (' + (booleanMatrix[i][j]).toFixed(2) + "%)</span></td>";
         }
         result += "</tr>";
     };
@@ -134,7 +182,12 @@ function printMatrix(myArray){
 function createNewList(){
     newListValues = document.getElementById("write-new-list").value;
     sanitizedList = sanitizeInputs(newListValues);
+
+    window.localStorage.setItem('sanitized-list', sanitizedList);
+
     list = sanitizedList.split(",");
+
+    window.localStorage.setItem('list', JSON.stringify(list));
 
     fifoRow = Array((list.length) - 2);
     fifoColumn = Array((list.length) - 2);
@@ -151,29 +204,49 @@ function createNewList(){
     document.getElementById("info").style.display = "none";
 
     //Create table rows, 1 for each list item + 1 for the labels
-    for (let i=0; i<list.length; i++) {
-        matrix[i] = [];
-        booleanMatrix[i] = []
-        totalVotes[i] = []
-        elo[i] = 1000;
-        for (let j=0; j < list.length; j++){
-            matrix[i][j] = list[i] + " v. " + list[j];
-            booleanMatrix[i][j] = 50;
-            totalVotes[i][j] = 0;
-        }
-      };
-
+    if (!window.localStorage.getItem('matrix')){
+        for (let i=0; i<list.length; i++) {
+            matrix[i] = [];
+            booleanMatrix[i] = []
+            totalVotes[i] = []
+            elo[i] = 1000;
+            for (let j=0; j < list.length; j++){
+                matrix[i][j] = list[i] + " v. " + list[j];
+                booleanMatrix[i][j] = 50;
+                totalVotes[i][j] = 0;
+            };
+        };
+    };
     //Create an equal amount of columns.
     //Black out the corners
     document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
-    document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*15 + '</p>';
+    document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*(list.length/2) + '</p>';
     giveChoice();
 };
 
 function giveChoice(){
-    let question = document.getElementById("question").value;
+    if (window.localStorage.getItem('question')){
+        question = window.localStorage.getItem('question');
+    } else {
+        question = document.getElementById("question").value;
+    }
     let sanitizedQuestion = sanitizeInputs(question);
 
+
+    percentageRemainingVotes = sumTotalVotes / ( (list.length - 1)*(list.length/2));
+
+
+    if (percentageRemainingVotes <= .999){
+        document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed: ' + sumTotalVotes + '/' +  (list.length - 1)*(list.length/2) + '</p>';
+    } else if (percentageRemainingVotes >= .999){
+        document.getElementById("votes-needed").innerHTML = '<p class="ready">Total Votes: ' + sumTotalVotes + '</p>';
+        document.getElementById("cool-graph").style.display = "block";
+
+    }
+
+    console.log(totalVotes)
+
+    window.localStorage.setItem('question', sanitizedQuestion);
     // Drawing criteria:
     // 1. The two choices have to be unique (x cannot be compared to x)
     // 2. Of the two choices, one must not have been drawn in the prior round. (if the last round was between x & y, then this round cannot have both x or y as choices. It must be one or the other. )
@@ -206,28 +279,36 @@ function giveChoice(){
 
 
 
-    document.getElementById("choices").innerHTML = '<h2>' + sanitizedQuestion + '?</h2>';
+    document.getElementById("choices").innerHTML = '<h2 id="question-header">' + sanitizedQuestion + '?</h2>';
     document.getElementById("choices").innerHTML += '<div class="buttons-to-press"><input type="button" class="choice-button" onclick="option(' + chooseRow +', ' + chooseColumn +')" name="option1" id="option1" value="' + list[chooseRow] + '">' + '<input type="button" class="choice-button" onclick="option(' + chooseColumn +', ' + chooseRow +')"" name="option2" id="option2" value="' + list[chooseColumn] + '"></div>';
 
 
     choiceA_Rating = elo[chooseRow];
     choiceB_Rating = elo[chooseColumn];
 
-    let x = choiceA_Rating - choiceB_Rating;
-    let y = choiceB_Rating - choiceA_Rating;
+/*     let x = choiceA_Rating - choiceB_Rating;
+    let y = choiceB_Rating - choiceA_Rating; */
 
     choiceA_TotalVotes = sumArrays(totalVotes[chooseRow]);
     choiceB_TotalVotes = sumArrays(totalVotes[chooseColumn]);
 
     //Expected Score
 
-    choiceA_ExpectedScore = 1/(1+10**((y)/1000));
-    choiceB_ExpectedScore = 1/(1+10**((x)/1000));
+  /*   choiceA_ExpectedScore = 1/(1+10**((y)/1000));
+    choiceB_ExpectedScore = 1/(1+10**((x)/1000)); */
+
+
+    choiceA_ExpectedScore = getExpectedScore(choiceA_Rating, choiceB_Rating);
+    choiceB_ExpectedScore = getExpectedScore(choiceB_Rating, choiceA_Rating);
+
+
 
     choiceA_K = findK(choiceA_TotalVotes, choiceA_Rating);
     choiceB_K = findK(choiceB_TotalVotes, choiceB_Rating);
 
 }
+
+
 
 
 function option(chosen, rejected){
@@ -260,7 +341,7 @@ function option(chosen, rejected){
         if (elo[rejected]<= 0){
             elo[rejected] = 0;
         }
-    } 
+    }; 
 
     if (elo[chooseColumn] == elo[chosen]){
         elo[chosen] = choiceB_Rating + choiceB_K * (1 - choiceB_ExpectedScore);
@@ -268,37 +349,42 @@ function option(chosen, rejected){
         if (elo[rejected]<= 0){
             elo[rejected] = 0;
         }
-    } 
+    }; 
 
-    let x = elo[chosen] - elo[rejected];
+   /*  let x = elo[chosen] - elo[rejected];
     let y = elo[rejected] - elo[chosen];
 
     let chosenChance = 1/(1+10**((y)/1000));
     let rejectedChance = 1/(1+10**((x)/1000));
 
     booleanMatrix[chosen][rejected] = (chosenChance * 100).toFixed(2); //Updated Changed
-    booleanMatrix[rejected][chosen] = (rejectedChance * 100).toFixed(2); //Updated Chances
+    booleanMatrix[rejected][chosen] = (rejectedChance * 100).toFixed(2); //Updated Chances */
+
+
+    for (let i=0; i<matrix.length; i++){
+        for (let j=0; j<matrix.length; j++){
+            booleanMatrix[i][j] = (getExpectedScore(elo[i], elo[j])*100);
+            console.log (booleanMatrix[i][j]);
+        }
+    }
+
+
 
     totalVotes[chosen][rejected] += 1;
     totalVotes[rejected][chosen] += 1;
 
     sumTotalVotes += 1;
-    
-    percentageRemainingVotes = sumTotalVotes / ((list.length - 1)*15);
 
-
-    if (percentageRemainingVotes <= .499){
-        document.getElementById("votes-needed").innerHTML = '<p class="not-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*15 + '</p>';
-    } else if ((percentageRemainingVotes >= .499) & (percentageRemainingVotes <= .999)){
-        document.getElementById("votes-needed").innerHTML = '<p class="almost-ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*15 + '</p>';
-    } else if (percentageRemainingVotes >= .999){
-        document.getElementById("votes-needed").innerHTML = '<p class="ready">Votes Needed (Recommended): ' + sumTotalVotes + '/' + (list.length - 1)*15 + '</p>';
-    }
-
-
+    window.localStorage.setItem('sum-total-votes', sumTotalVotes);
 
     giveChoice();
     document.getElementById("list-item-matrix").innerHTML = printMatrix(matrix);
+
+    window.localStorage.setItem('elo', JSON.stringify(elo));
+    window.localStorage.setItem('votes', JSON.stringify(totalVotes));
+    window.localStorage.setItem('matrix', JSON.stringify(matrix));
+    window.localStorage.setItem('boolean-matrix', JSON.stringify(booleanMatrix));
+
 
 /* 
     document.getElementById("results-list").innerHTML = " "
@@ -308,3 +394,22 @@ function option(chosen, rejected){
     }; */
 
 };
+
+function restart(){
+    window.localStorage.removeItem('elo');
+    window.localStorage.removeItem('votes');
+    window.localStorage.removeItem('matrix');
+    window.localStorage.removeItem('boolean-matrix');
+    window.localStorage.removeItem('sum-total-votes');
+
+    matrix = [];
+    booleanMatrix = [];
+    totalVotes = [];
+    list = [];
+    elo = [];
+    sumTotalVotes = 0;
+
+    document.getElementById("exercise").style.display = "none";
+    document.getElementById("info").style.display = "block";
+    document.getElementById("cool-graph").style.display = "none";
+}

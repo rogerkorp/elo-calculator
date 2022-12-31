@@ -4,7 +4,7 @@
     --black: #000000;
     --white: #ffffff;
     --blue: rgb(0, 112, 245);
-    --light-blue: rgb(225, 233, 244);
+    --light-blue: rgb(236, 240, 245);
     --green: rgb(52, 199, 89);
     --green-text: rgb(16, 103, 37);
     --red: rgb(255, 59, 48);
@@ -32,52 +32,59 @@ body{
 table{
     table-layout: fixed;
     font-size: .8em;
+    text-align: center;
+    border-collapse: collapse;
 }
 
 td{
     position: relative;
-    width: 3em;
+    min-width: 3em;
 }
 
 th{
     padding: 1em;
-    text-align: right;
+    text-align: center;
     white-space: nowrap;
+    border-right: 1px solid var(--light-blue);
 }
 
-tr:nth-child(even) th{
+tr:nth-child(even){
     background-color: var(--light-blue);
-};
+}
 
-
-td:nth-child(even) th{
+.shade:nth-child(even){
     background-color: var(--light-blue);
 }
 
 
 main{
-    padding: 1em;
-    text-align: center;
+    padding: 2em;
 }
 
 
 footer{
     margin-top: 5em;
-    text-align: center;
-    border-top: 1px solid var(--gray);
+    margin-left: 2em;
 }
 
 h2{
     font-size: 2em;
 }
 
+h1{
+    margin: 0;
+}
+
 summary{
-    padding: 1em;
+    padding: 1.25em;
     background-color: var(--white);
-    border: 1px solid var(--gray);
+    border: 1px solid var(--blue);
     width: 150px;
-    margin: 0 auto 0;
-    border-radius: .25em;
+    border-radius: .5em;
+    color: var(--blue);
+    text-align: center;
+    margin-left: .8em;
+    font-weight: bold;
 }
 
 summary:hover{
@@ -110,9 +117,11 @@ details{
     width: 12em;
     height: 12em;
     margin: .25em;
+    margin-left: .55em;
     background-color: var(--white);
-    border: 1px solid var(--gray);
-    border-radius: .25em;
+    border: 1px solid var(--blue);
+    color: var(--blue);
+    border-radius: .5em;
     white-space: normal;
     word-wrap: break-word;
     padding: .25em;
@@ -174,16 +183,19 @@ details{
 .not-ready{
     font-weight: bold;
     color: var(--red);
+    margin-left: .5em;
 }
 
 .almost-ready{
     font-weight: bold;
     color: var(--yellow);
+    margin-left: .5em;
 }
 
 .ready{
     font-weight: bold;
     color: var(--green);
+    margin-left: .5em;
 }
 
 .top-row{
@@ -192,7 +204,7 @@ details{
 
 .form-text{
     font-size: 1em;
-    border-radius: .25em;
+    border-radius: .5em;
     border: 1px solid var(--gray);
     padding: 1em;
     width: 75%;
@@ -204,19 +216,16 @@ details{
 .data{
     max-width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .submit-button{
-    padding: 1em;
-    border-radius: 15em;
-    width: 15%;
-    min-width: 200px;
+    padding: 1em 2em 1em;
+    border-radius: .5em;
     background-color: var(--white);
-    border: 1px solid var(--gray);
-    color: var(--black);
+    border: 1px solid var(--blue);
+    color: var(--blue);
     font-weight: bold;
+    margin-left: .8em;
 }
 
 .submit-button:hover{
@@ -231,7 +240,6 @@ details{
 .about-text{
     text-align: left;
     max-width: 800px;
-    margin: auto auto auto;
 }
 
 .column-header{
@@ -242,8 +250,13 @@ details{
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
 
+}
+
+.author{
+    margin: 0;
+    margin-top: .5em;
+    font-size: 1.5em;
 }
 
 /* ---- */
@@ -269,11 +282,22 @@ td .tooltiptext {
   }
 
 
+.y-axis-label{
+    padding: 1em;
+}
+
+.y-axis-elo{
+    padding: 1em;
+    font-weight: 500;
+}
+
+
 /* ------- ID Selectors ------- */
 
 #votes-needed{ 
     margin-top: 2em;
     margin-bottom: 2em;
+    margin-left: .25em;
 }
 
 #create-new-list-submit:hover{
@@ -284,15 +308,16 @@ td .tooltiptext {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
     background-color: #ffffff;
+    text-align: left;
+    padding: 2em;
 }
 
 #return-link{
     color: var(--blue);
     text-decoration: none;
     padding-bottom: 4em;
+    margin-left: .25em;
 }
 
 #return-link:hover{
@@ -301,6 +326,18 @@ td .tooltiptext {
 
 #return-link:visited{
     color: var(--blue);
+}
+
+#choices{
+    width: 100vw
+}
+
+#question-header{
+    margin-left: .25em;
+}
+
+#create-new-list{
+    margin-top: 2em;
 }
 
 /* ------- Media Queries ------- */
