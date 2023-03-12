@@ -31,7 +31,7 @@
                 <p class="author">By: Roger Korpics</p>
                 <form id="create-new-list" name="create-new-list" onsubmit="return createNewList(this)">
                     <label for="write-new-question">Comparison Question:</label><br>
-                    <input class="form-text" name="write-new-question" type="text" id="question" placeholder="Ex. Which one do you prefer?" required><br>
+                    <input class="form-text" name="write-new-question" type="text" id="question" placeholder="Ex. Which fruit is better?" required><br>
                     <label for="write-new-list">Contestant List:</label><br>
                     <textarea  class="form-text" name="write-new-list" id="write-new-list" placeholder="Ex. Apples, Bananas, Limes (Seperate list items with commas)" required></textarea><br>
                     <input class="submit-button" type="submit" name="create-new-list-submit" id="create-new-list-submit" value="Submit">
@@ -40,8 +40,8 @@
                     <h2>About</h2>
                     <p>This is a website I wrote up to help me rank arbitrary things. You start by posing a comparison question (ex. "Which one do you prefer?", "Which one sounds better to you?" etc.) and then you write down a list of items you want to compete against each other. Submit the form when you're ready, and then vote on each randomized pair you are presented with. Once you have voted enough times, the rankings should be accurate enough to determine your personal preferences.</p>
                     <h2>How to Read the Chart</h2>
-                    <p>The Y-axis lists off each item, along with its ID number and its ELO value. The X-axis lists the IDs of each opponent.
-                    <p>Each square represents the percent chance that the Y-axis item will be preferred over the X-axis item. <b style="color: var(--green)">Green squares</b> indicate that the Y-axis item is <b style="color: var(--green)">more likely to be chosen</b> over the X-axis item, and <b style="color: var(--red)">Red squares</b> indicate the opposite - that the Y-axis item is <b style="color: var(--red)">less likely to be chosen</b> over the X-axis one. Grey squares are neutral, and indicate that either the pair-up has not been voted on yet, or that there is no preference between the two items.</p>
+                    <p>The Y-axis lists off each item, along with its ID number and its rank. The X-axis lists the IDs of each opponent.</p>
+                    <p>Each square represents the percent chance that the Y-axis item will be preferred over the X-axis item. <b style="color: var(--blue)">Blue squares</b> indicate that the Y-axis item is <b style="color: var(--blue)">more likely to be chosen</b> over the X-axis item, and <b style="color: var(--red)">Red squares</b> indicate the opposite - that the Y-axis item is <b style="color: var(--red)">less likely to be chosen</b> over the X-axis one.</p>
                 </div>
             </div>
         </main>

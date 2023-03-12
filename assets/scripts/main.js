@@ -151,7 +151,7 @@ function printMatrix(myArray){
        result += '<colgroup class="shade"></colgroup>'
     };
 
-    result +='<tr><th>NAME</th><th>ELO</th><th>ID</th>'
+    result +='<tr><th>NAME</th><th>RANK</th><th>ID</th>'
 
     for (let i=0; i<myArray.length; i++) {
         result += '<th scope="column" class="column-header">' + (i+1) + '</th>';
